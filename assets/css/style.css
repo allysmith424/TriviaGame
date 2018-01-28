@@ -23,10 +23,13 @@ h1 {
 	margin-bottom: 30px;
 }
 
+.firstImage {
+	left: px;
+}
+
 .initialText {
 	font-size: 18px;
-	letter-spacing: 20px;
-	color: #757575;
+	letter-spacing: 30px;
 	line-height: 500%;
 	position: relative;
 	left: 100px;
@@ -41,11 +44,15 @@ h1 {
 	margin-bottom: 0;
 }
 
+.timeLow {
+	color: #ff3845;
+}
+
 h3 p {
 	position: relative;
 	float: left;
 	color: #757575;
-	font-size: 14px;
+	font-size: 15px;
 	letter-spacing: 5px;
 	margin-bottom: 0;
 }
@@ -53,6 +60,15 @@ h3 p {
 #question {
 	height: 400px;
 	letter-spacing: 1.25px;
+}
+
+.question {
+	position: relative;
+	float: left;
+	font-size: 14px;
+	color: #000000;
+	letter-spacing: 1.25px;
+	padding-top: 50px;
 }
 
 h3 {
@@ -66,6 +82,12 @@ button {
 
 button:hover {
 	color: #ff3845;
+}
+
+.resetButton {
+	position: relative;
+	float: left;
+	top: 85px;
 }
 
 .answer {

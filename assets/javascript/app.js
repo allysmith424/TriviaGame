@@ -41,17 +41,13 @@
 
 	var usedQuestions = [];
 
-// variables
-
-	// used questions array
-
-	// time
-
 	var questionCount = 0;
 
 	var correctAnswers = 0, incorrectAnswers = 0, unanswered = 0;
 
 	var time = 30;
+
+	var intervalID;
 
 	var questionTimeout;
 
@@ -72,29 +68,62 @@
 function initializeGame() {
 	$(".art").replaceWith("<img src='assets/images/colorSquare.jpg' alt='art'>")
 	$("img").addClass("art");
-	questionChosen = false;
+	$("img").addClass("firstImage");
 	gameComplete = false;
+	questionChosen = false;
 	questionCount = 0;
 	correctAnswers = 0;
 	incorrectAnswers = 0;
 	unanswered = 0;
+	time = 30;
+	$(".resetButton").remove();
 };
 
 function startQCountdown() {
-	questionTimeout = setTimeout(checkIfCorrect, 5 * 1000);
+	questionTimeout = setTimeout(checkIfCorrect, 30 * 1000);
 };
 
 function stopQCountdown() {
 	clearTimeout(questionTimeout);
-}
+};
 
 function startSSTimeout() {
-	scoreScreenTimeout = setTimeout(chooseQuestion, 5 * 1000);
-}
+	scoreScreenTimeout = setTimeout(function() {
+		checkIfFinished();
+		chooseQuestion();
+	}, 5 * 1000);
+};
+
+function decrement() {
+	time--;
+	$("#timer").text("00:" + time);
+	if (time < 10) {
+		$("#timer").text("00:0" + time);
+		if (time < 6) {
+			$("#timer").attr("style", "color:#ff3845");
+		}
+		else if (time <= 0) {
+			stopTimeDisplay();
+		}
+	}
+};
+
+function startTimeDisplay() {
+	$("#timer").attr("style", "color:#757575");
+	time = 30;
+	clearInterval(intervalID);
+	intervalID = setInterval(decrement, 1000);
+};
+
+function stopTimeDisplay() {
+	clearInterval(intervalID);
+	time = 30;
+	$("#timer").text("");
+};
 
 function stopSSTimeout() {
-	clearTimeout(scoreScreenTimeout, 5 * 1000);
-}
+	clearTimeout(scoreScreenTimeout);
+};
 
 function chooseQuestion() {
 
@@ -127,10 +156,13 @@ function chooseQuestion() {
 	usedQuestions.push(questions[randomNumber]);
 	questionChosen = true;
 	startQCountdown();
+	startTimeDisplay();
 	}
 };
 
 function checkIfCorrect() {
+
+	stopTimeDisplay();
 
 	$(".art").replaceWith("<img src='" + questions[randomNumber].artistImage + "' alt='" + questions[randomNumber].artist + "'>")
 		$("img").addClass("art");
@@ -139,20 +171,22 @@ function checkIfCorrect() {
 		correctAnswers++;
 		questions.splice(randomNumber, 1);
 		$("#answerList").empty();
-		$("#question").html("<p>Nice work<br><br>You're currently on <br>" + correctAnswers + " correct<br>" + incorrectAnswers + " incorrect<br>and " + unanswered + " unanswered");
+		$("#question").html("<p class='question'>" + correctArtist + " is indeed the correct answer<br><br><br><br>Current scores:<br><br>" + correctAnswers + " correct<br><br>" + incorrectAnswers + " incorrect<br><br>" + unanswered + " unanswered");
 	}
-	else if (guess === undefined) {
+	else if (guess === undefined || guess === "not answered") {
 		unanswered++;
 		questions.splice(randomNumber, 1);
 		$("#answerList").empty();
-		$("#question").html("<p>You didn't answer!<br><br>You're currently on <br>" + correctAnswers + " correct<br>" + incorrectAnswers + " incorrect<br>and " + unanswered + " unanswered");
+		$("#question").html("<p class='question'>You didn't answer!<br><br>For reference, " + correctArtist + " is the correct answer<br><br><br><br>Current scores:<br><br>" + correctAnswers + " correct<br><br>" + incorrectAnswers + " incorrect<br><br>" + unanswered + " unanswered");
 	}
 	else if (guess !== correctAnswers) {
 		incorrectAnswers++;
 		questions.splice(randomNumber, 1);
 		$("#answerList").empty();
-		$("#question").html("<p>Not right, unfortunately<br><br>You're currently on <br>" + correctAnswers + " correct<br>" + incorrectAnswers + " incorrect<br>and " + unanswered + " unanswered");
+		$("#question").html("<p class='question'>Incorrect, unfortunately<br><br>" + correctArtist + " is the correct answer<br><br><br><br>Current scores:<br><br>" + correctAnswers + " correct<br><br>" + incorrectAnswers + " incorrect<br><br>" + unanswered + " unanswered");
 	}
+	startSSTimeout();
+	guess = "not answered"
 };
 
 function checkIfFinished() {
@@ -160,9 +194,20 @@ function checkIfFinished() {
 		return
 	}
 	else {
-		$("#questionDiv").html("<p class=>Final scores<br><br>" + correctAnswers + " correct<br>" + incorrectAnswers + " incorrect<br>and " + unanswered + " unanswered");
+		$("#question").html("<p class='question'>Final scores<br><br><br><br>" + correctAnswers + " correct<br><br>" + incorrectAnswers + " incorrect<br><br>" + unanswered + " unanswered");
+		$("#answerList").empty();
 		gameInProgress = false;
 		gameComplete = true;
+		stopSSTimeout();
+		var resetButton = $("<button>");
+		resetButton.text("TRY AGAIN");
+		resetButton.addClass("resetButton");
+		$(".question").append("<br><br><br>");
+		$(".question").append(resetButton);
+		for (var i = 0; i < usedQuestions.length; i++) {
+			questions.push(usedQuestions[i]);
+			usedQuestions.splice(i, 1);
+		};
 	}
 };
 
@@ -180,76 +225,13 @@ $(document).ready(function() {
 		guess = $(this).attr("data-name")
 		checkIfCorrect();
 		checkIfFinished();
-		startSSTimeout();
+	});
+
+	$("#questionDiv").on("click", ".resetButton", function() {
+		initializeGame();	
 	});
 
 });
-
-	// set timer to 30 seconds
-
-		// change timer variable
-
-		// update DOM
-
-	// start timer ()
-
-	// if no click before time ends
-
-		// display time's up on DOM
-
-		// unanswered ++
-
-	// choose question from array
-
-		// update DOM with object data
-
-	// push object to used questions array
-
-// function game complete ()
-
-	// game complete = true
-
-	// display final scores
-
-	// display reset button
-
-		// if clicked
-
-			// initialise game ()
-
-// function initialise game ()
-
-	// push ( / combine ) used questions array to ( / with ) main questions array
-
-	// game complete = false
-
-	// return variables to 0
-
-// listen to click
-
-	// display relevant picture
-
-	// if correct
-
-		// display "your're correct"
-
-		// correct answers  ++
-
-	// if not correct
-
-		// display "not correct"
-
-		// incorrect answers ++
-
-	// check if quesiton count
-
-		// if question count = questionsArray.length
-
-		// game complete ()
-
-	// choose question
-
-initializeGame();
 
 
 
